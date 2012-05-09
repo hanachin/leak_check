@@ -30,14 +30,17 @@ end
 
 client = UserStream.client
 client.user do |status|
-  pp status
-  screen_name = status['user']['screen_name'] if status['user']
-  if status['in_reply_to_screen_name']
-    if $screen_names.index(screen_name)
-      message = "your twitter password is leaked!"
-    else
-      message = "your twitter password is not leaked!"
+  begin
+    pp status
+    screen_name = status['user']['screen_name'] if status['user']
+    if status['in_reply_to_screen_name']
+      if $screen_names.index(screen_name)
+        message = "your twitter password is leaked!"
+      else
+        message = "your twitter password is *NOT* leaked!"
+      end
+      Twitter.update "@#{screen_name} #{message}", in_reply_to_status_id: status['id']
     end
-    Twitter.update "@#{screen_name} #{message}", in_reply_to_status_id: status['id']
+  rescue
   end
 end
